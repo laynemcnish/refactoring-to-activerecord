@@ -1,4 +1,4 @@
-require "app"
+require_relative "./../app"
 require "user"
 require "fish"
 require "connection"
