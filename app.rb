@@ -14,7 +14,6 @@ class App < Sinatra::Application
 
   get "/" do
     user = current_user
-
     if current_user
       users = User.where.not(id: current_user["id"])
       fish = Fish.where(user_id: current_user["id"])
@@ -30,7 +29,6 @@ class App < Sinatra::Application
 
   post "/registrations" do
     user = User.create(:username => "#{params[:username]}", :password => "#{params[:password]}")
-
     if user.valid?
       user.save
       flash[:notice] = "Thanks for registering"
@@ -44,7 +42,6 @@ class App < Sinatra::Application
   post "/sessions" do
     if validate_authentication_params
       user = authenticate_user
-
       if user != nil
         session[:user_id] = user["id"]
       else
@@ -75,7 +72,6 @@ class App < Sinatra::Application
   end
 
   post "/fish" do
-
     fish = Fish.create(:name => "#{params[:name]}", :wikipedia_page => "#{params[:wikipedia_page]}", :user_id => current_user["id"])
     if fish.valid?
       fish.save
