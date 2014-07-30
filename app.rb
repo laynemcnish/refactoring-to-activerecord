@@ -78,7 +78,7 @@ class App < Sinatra::Application
 
   get "/fish/:id" do
     # fish = @database_connection.sql("SELECT * FROM fish WHERE id = #{params[:id]}").first
-    fish = Fish.find_by(id:params[:id]).first
+    fish = Fish.find_by(id:params[:id])
     erb :"fish/show", locals: {fish: fish}
   end
 
@@ -104,8 +104,7 @@ class App < Sinatra::Application
   private
 
   def validate_registration_params
-    if params[:username] != "" && params[:password].length > 3 && User.find_by(:username => params[:username])
-      # username_available?(params[:username])
+    if params[:username] != "" && params[:password].length > 3 && username_available?(params[:username])
       return true
     end
 
@@ -171,15 +170,17 @@ class App < Sinatra::Application
     false
   end
 
-  # def username_available?(username)
-  #   existing_users = User.find_by(username:"#{username}")
-  #     # @database_connection.sql("SELECT * FROM users where username = '#{username}'")
-  #
-  #   existing_users.length == 0
-  # end
+  def username_available?(username)
+    existing_users = User.where(username:username)
+
+    # find(:first, :conditions => "user_name = '#{user_name}' AND password = '#{password}'")
+      # @database_connection.sql("SELECT * FROM users where username = '#{username}'")
+
+    existing_users.length == 0
+  end
 
   def authenticate_user
-   User.find_by(username:"#{params[:username]}", password:"#{params[:password]}").first
+   User.find_by(username:"#{params[:username]}", password:"#{params[:password]}")
     # select_sql = <<-SQL
     # SELECT * FROM users
     # WHERE username = '#{params[:username]}' AND password = '#{params[:password]}'
@@ -190,7 +191,7 @@ class App < Sinatra::Application
 
   def current_user
     if session[:user_id]
-      User.find_by(id:session[:user_id]).first
+      User.where(id:session[:user_id])
       #
       # select_sql = <<-SQL
       # SELECT * FROM users
