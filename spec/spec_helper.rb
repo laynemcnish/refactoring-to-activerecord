@@ -1,4 +1,7 @@
-require_relative "./../app"
+require "app"
+require "user"
+require "fish"
+require "connection"
 require "capybara/rspec"
 require "database_cleaner"
 ENV["RACK_ENV"] = "test"
