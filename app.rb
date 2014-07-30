@@ -16,8 +16,8 @@ class App < Sinatra::Application
     user = current_user
 
     if current_user
-      users = User.find_by(id:user["id"])
-      fish = Fish.find_by(user_id:user["id"])
+      users = User.find_by(:id => user["id"])
+      fish = Fish.find_by(:user_id => user["id"])
       erb :signed_in, locals: {current_user: user, users: users, fish_list: fish}
     else
       erb :signed_out
@@ -31,7 +31,7 @@ class App < Sinatra::Application
   post "/registrations" do
     if validate_registration_params
 
-      User.create(username: '#{params[:username]}', password: '#{params[:password]}')
+      User.create(:username => "#{params[:username]}", :password => "#{params[:password]}")
 
       flash[:notice] = "Thanks for registering"
       redirect "/"
@@ -60,12 +60,14 @@ class App < Sinatra::Application
   end
 
   delete "/users/:id" do
-    delete_sql = <<-SQL
-    DELETE FROM users
-    WHERE id = #{params[:id]}
-    SQL
+    Users.destroy(id:params[:id])
 
-    @database_connection.sql(delete_sql)
+    # delete_sql = <<-SQL
+    # DELETE FROM users
+    # WHERE id = #{params[:id]}
+    # SQL
+    #
+    # @database_connection.sql(delete_sql)
 
     redirect "/"
   end
@@ -75,18 +77,21 @@ class App < Sinatra::Application
   end
 
   get "/fish/:id" do
-    fish = @database_connection.sql("SELECT * FROM fish WHERE id = #{params[:id]}").first
+    # fish = @database_connection.sql("SELECT * FROM fish WHERE id = #{params[:id]}").first
+    fish = Fish.find_by(id:params[:id]).first
     erb :"fish/show", locals: {fish: fish}
   end
 
   post "/fish" do
     if validate_fish_params
-      insert_sql = <<-SQL
-      INSERT INTO fish (name, wikipedia_page, user_id)
-      VALUES ('#{params[:name]}', '#{params[:wikipedia_page]}', #{current_user["id"]})
-      SQL
+    Fish.create(:name => "#{params[:name]}", :wikipedia_page => "#{params[:wikipedia_page]}", :user_id => current_user["id"])
 
-      @database_connection.sql(insert_sql)
+      # insert_sql = <<-SQL
+      # INSERT INTO fish (name, wikipedia_page, user_id)
+      # VALUES ('#{params[:name]}', '#{params[:wikipedia_page]}', #{current_user["id"]})
+      # SQL
+      #
+      # @database_connection.sql(insert_sql)
 
       flash[:notice] = "Fish Created"
 
@@ -99,7 +104,8 @@ class App < Sinatra::Application
   private
 
   def validate_registration_params
-    if params[:username] != "" && params[:password].length > 3 && username_available?(params[:username])
+    if params[:username] != "" && params[:password].length > 3 && User.find_by(:username => params[:username])
+      # username_available?(params[:username])
       return true
     end
 
@@ -109,7 +115,8 @@ class App < Sinatra::Application
       error_messages.push("Username is required")
     end
 
-    if !username_available?(params[:username])
+    if User.find_by(:username => params[:username])
+    # !username_available?(params[:username])
       error_messages.push("Username has already been taken")
     end
 
@@ -164,29 +171,33 @@ class App < Sinatra::Application
     false
   end
 
-  def username_available?(username)
-    existing_users = @database_connection.sql("SELECT * FROM users where username = '#{username}'")
-
-    existing_users.length == 0
-  end
+  # def username_available?(username)
+  #   existing_users = User.find_by(username:"#{username}")
+  #     # @database_connection.sql("SELECT * FROM users where username = '#{username}'")
+  #
+  #   existing_users.length == 0
+  # end
 
   def authenticate_user
-    select_sql = <<-SQL
-    SELECT * FROM users
-    WHERE username = '#{params[:username]}' AND password = '#{params[:password]}'
-    SQL
-
-    @database_connection.sql(select_sql).first
+   User.find_by(username:"#{params[:username]}", password:"#{params[:password]}").first
+    # select_sql = <<-SQL
+    # SELECT * FROM users
+    # WHERE username = '#{params[:username]}' AND password = '#{params[:password]}'
+    # SQL
+    #
+    # @database_connection.sql(select_sql).first
   end
 
   def current_user
     if session[:user_id]
-      select_sql = <<-SQL
-      SELECT * FROM users
-      WHERE id = #{session[:user_id]}
-      SQL
-
-      @database_connection.sql(select_sql).first
+      User.find_by(id:session[:user_id]).first
+      #
+      # select_sql = <<-SQL
+      # SELECT * FROM users
+      # WHERE id = #{session[:user_id]}
+      # SQL
+      #
+      # @database_connection.sql(select_sql).first
     else
       nil
     end
