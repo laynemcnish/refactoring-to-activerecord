@@ -62,7 +62,7 @@ class App < Sinatra::Application
   end
 
   delete "/users/:id" do
-    Users.destroy(id:params[:id])
+    User.destroy_all(:id => (params["id"].to_i))
 
     # delete_sql = <<-SQL
     # DELETE FROM users

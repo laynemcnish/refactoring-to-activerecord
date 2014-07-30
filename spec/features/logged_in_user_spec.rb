@@ -25,6 +25,7 @@ feature "Logged in user" do
 
     click_button "Sign In"
 
+
     within ".user-list" do
       expect(page).to have_no_content "hoonta"
       expect(page).to have_content "Fred"

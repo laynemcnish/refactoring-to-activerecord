@@ -4,6 +4,7 @@ require "fish"
 require "connection"
 require "capybara/rspec"
 require "database_cleaner"
+require "launchy"
 ENV["RACK_ENV"] = "test"
 
 Capybara.app = App
