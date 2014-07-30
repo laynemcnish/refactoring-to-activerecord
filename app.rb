@@ -16,8 +16,10 @@ class App < Sinatra::Application
     user = current_user
 
     if current_user
-      users = User.find_by(:id => user["id"])
-      fish = Fish.find_by(:user_id => user["id"])
+      # users = @database_connection.sql("SELECT * FROM users WHERE id != #{user["id"]}")
+      # fish = @database_connection.sql("SELECT * FROM fish WHERE user_id = #{current_user["id"]}")
+      users = User.where.not(id:user["id"])
+      fish = Fish.where(user_id:current_user["id".to_i])
       erb :signed_in, locals: {current_user: user, users: users, fish_list: fish}
     else
       erb :signed_out
@@ -78,7 +80,7 @@ class App < Sinatra::Application
 
   get "/fish/:id" do
     # fish = @database_connection.sql("SELECT * FROM fish WHERE id = #{params[:id]}").first
-    fish = Fish.find_by(id:params[:id])
+    fish = Fish.find(id:params[:id])
     erb :"fish/show", locals: {fish: fish}
   end
 
@@ -191,7 +193,7 @@ class App < Sinatra::Application
 
   def current_user
     if session[:user_id]
-      User.where(id:session[:user_id])
+      User.find_by(id:session[:user_id])
       #
       # select_sql = <<-SQL
       # SELECT * FROM users

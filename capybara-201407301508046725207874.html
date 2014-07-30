@@ -1,4 +1,14 @@
-<p>Welcome, <%= current_user["username"] %></p>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fish.ly</title>
+</head>
+<body>
+<h1><a href="/">Fish.ly</a></h1>
+
+    <p>Fish Created</p>
+
+<p>Welcome, hoonta</p>
 
 <form action="/sessions" method="post">
   <input type="hidden" name="_method" value="delete"/>
@@ -8,15 +18,15 @@
 <h2>Users</h2>
 
 <ul class="user-list">
-  <% users.each do |user| %>
+  
     <li>
-      <%= user["username"] %>
-      <form method="post" action="/users/<%= user["id"] %>">
+      Fred
+      <form method="post" action="/users/1">
         <input type="hidden" name="_method" value="delete" />
         <input type="submit" value="Delete" />
       </form>
     </li>
-  <% end %>
+  
 </ul>
 
 <h2>Fish</h2>
@@ -24,9 +34,6 @@
 <a href="/fish/new">New Fish</a>
 
 <ul class="fish-list">
-  <% fish_list.each do |fish|%>
-    <li>
-      <a href="/fish/<%= fish["id"] %>"><%= fish["name"] %></a>
-    </li>
-<% end %>
-</ul>
+  </ul>
+</body>
+</html>

@@ -75,7 +75,6 @@ feature "Logged in user" do
     fill_in "Name", with: "Oarfish"
     fill_in "Wikipedia Page", with: "http://en.wikipedia.org/wiki/Oarfish"
     click_button "Create Fish"
-
     within ".fish-list" do
       expect(page).to have_content "coelacanth"
       expect(page).to have_content "Oarfish"
